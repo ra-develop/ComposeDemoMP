@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "composeApp on Phone",
+            "type": "android-app",
+            "workingDir": "$PROJECT_DIR$",
+            "allowParallelRun": true,
+            "module": "ComposeDemo.composeApp.main",
+            "destination": "Pixel 7 Pro API 34 6.71"
+        }
+    ]
+}
