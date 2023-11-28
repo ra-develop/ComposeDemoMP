@@ -29,7 +29,7 @@ fun App() {
         var showImage by remember { mutableStateOf(false) }
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Today's date is ${todaysDate()}",
+                text = "Today's date is ${toDaysDate()}",
                 modifier = Modifier.padding(20.dp),
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center
@@ -76,7 +76,7 @@ fun App() {
     }
 }
 
-fun todaysDate(): String {
+fun toDaysDate(): String {
     fun LocalDateTime.format() = toString().substringBefore('T')
 
     val now = Clock.System.now()
