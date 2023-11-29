@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "composeApp on Phone",
+            "name": "composeApp on Android Phone",
             "type": "android-app",
             "workingDir": "$PROJECT_DIR$",
             "allowParallelRun": true,

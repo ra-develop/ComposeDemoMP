@@ -1,10 +1,7 @@
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,22 +18,38 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
+
+data class Country(val name: String, val zone: TimeZone, val flagImage: String)
+
+fun countries() = listOf(
+    Country("Japan", TimeZone.of("Asia/Tokyo"), "🇯🇵" ),
+    Country("France", TimeZone.of("Europe/Paris"), "🇫🇷"),
+    Country("Mexico", TimeZone.of("America/Mexico_City"), "🇲🇽"),
+    Country("Indonesia", TimeZone.of("Asia/Jakarta"), "🇮🇩"),
+    Country("Egypt", TimeZone.of("Africa/Cairo"), "🇪🇬"),
+)
+
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun App() {
+fun App(countries: List<Country> = countries()) {
     MaterialTheme {
         var greetingText by remember { mutableStateOf("Hello World!") }
         var showImage by remember { mutableStateOf(false) }
+
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Today's date is ${toDaysDate()}",
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp),
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center
             )
-            var location by remember { mutableStateOf("Europe/Paris") }
+
             var timeAtLocation by remember { mutableStateOf("No location selected") }
-            Column(modifier = Modifier.padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     timeAtLocation,
                     style = TextStyle(fontSize = 20.sp),
@@ -45,19 +58,40 @@ fun App() {
                         .align(Alignment.CenterHorizontally)
                 )
 
-                TextField(
-                    value = location,
-                    modifier = Modifier.padding(top = 10.dp),
-                    onValueChange = {
-                        location = it
+                var showCountries by remember { mutableStateOf(false) }
+
+                Row(
+                    modifier = Modifier.padding(10.dp),
+                ) {
+                    DropdownMenu(
+                        expanded = showCountries,
+                        onDismissRequest = { showCountries = false }
+                    ) {
+                        countries.forEach { (name, zone, flagImage) ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    timeAtLocation = currentTimeAt(name, zone)
+                                    showCountries = false
+                                }
+                            ) {
+                                Text("$flagImage $name")
+                            }
+                        }
                     }
-                )
-                Button(modifier = Modifier.padding(20.dp), onClick = {
-                    timeAtLocation = currentTimeAt(location) ?: "Invalid Location"
-                }) {
-                    Text("Show Time At Location",
-                        textAlign = TextAlign.Center)
+
                 }
+
+                Button(
+                    modifier = Modifier.padding(10.dp),
+                    onClick = { showCountries = !showCountries }
+                ) {
+                    Text(
+                        "Select Location",
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+
             }
             Spacer(Modifier.requiredHeight(20.dp))
             Button(onClick = {
@@ -84,15 +118,11 @@ fun toDaysDate(): String {
     return now.toLocalDateTime(zone).format()
 }
 
-fun currentTimeAt(location: String): String? {
+fun currentTimeAt(location: String, zone: TimeZone): String {
     fun LocalTime.formatted() = "$hour:$minute:$second"
 
-    return try {
-        val time = Clock.System.now()
-        val zone = TimeZone.of(location)
-        val localTime = time.toLocalDateTime(zone).time
-        "The time in $location is ${localTime.formatted()}"
-    } catch (ex: IllegalTimeZoneException) {
-        null
-    }
+    val time = Clock.System.now()
+    val localTime = time.toLocalDateTime(zone).time
+
+    return "The time in $location is ${localTime.formatted()}"
 }
